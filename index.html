@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Интерактивная схема: цель, ограничения качества и гипотезы роста выручки." />
+  <title>Рост выручки отдела продаж</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --page: #ffffff;
+      --card: #ffffff;
+      --ink: #162033;
+      --muted: #5e6a7f;
+      --line: #d8e0ea;
+      --green-bg: #f0fdf4;
+      --green-line: #a7f3c4;
+      --green: #5fae40;
+      --blue-bg: #eff6ff;
+      --blue-line: #cfe0fa;
+      --blue: #2563eb;
+      --shadow: 0 4px 14px rgba(44, 62, 88, 0.09);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background: var(--page);
+      font-family: Inter, Arial, sans-serif;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 40px;
+    }
+
+    .intro {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(240px, 0.85fr) minmax(410px, 1.15fr);
+      gap: 14px;
+    }
+
+    .card {
+      overflow: hidden;
+      border: 1px solid rgba(203, 214, 227, 0.9);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .card--goal { background: var(--green-bg); border-color: var(--green-line); }
+    .card--quality { background: var(--blue-bg); border-color: var(--blue-line); }
+    .card--wide { grid-column: 1 / -1; }
+
+    .trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 12px;
+      padding: 16px 18px;
+      border: 0;
+      color: var(--ink);
+      background: transparent;
+      font: inherit;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .card--goal .trigger {
+      min-height: 60px;
+      align-items: center;
+    }
+
+    .card--goal .trigger__title {
+      align-items: center;
+    }
+
+    .trigger:hover { background: rgba(255, 255, 255, 0.34); }
+
+    .trigger:focus-visible {
+      outline: 3px solid var(--blue);
+      outline-offset: -3px;
+    }
+
+    .trigger__title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-icon {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      flex: 0 0 28px;
+      place-items: center;
+      border-radius: 8px;
+      background: #e8f1ff;
+      color: var(--blue);
+      font-size: 16px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 3px 7px;
+      border-radius: 6px;
+      background: #edf3fb;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .chevron {
+      width: 11px;
+      height: 11px;
+      flex: 0 0 11px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg) translateY(-3px);
+      transition: transform 180ms ease;
+    }
+
+    .trigger[aria-expanded="true"] .chevron {
+      transform: rotate(225deg) translateY(-2px);
+    }
+
+    .panel {
+      display: grid;
+      grid-template-rows: 0fr;
+      opacity: 0;
+      transition: grid-template-rows 260ms ease, opacity 180ms ease;
+    }
+
+    .panel.is-open {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+
+    .panel__inner {
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .content {
+      padding: 0 18px 18px;
+    }
+
+    .card--goal .content {
+      display: flex;
+      min-height: 176px;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .goal-text {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .goal-number {
+      display: block;
+      margin-top: 12px;
+      color: var(--green);
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .quality-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .quality-item {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 12px;
+      border: 1px solid var(--blue-line);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .quality-icon {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      flex: 0 0 32px;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #f8fbff;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .quality-item strong,
+    .hypothesis p strong { font-weight: 700; }
+
+    .quality-item small {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.3;
+    }
+
+    .hypothesis p {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.45;
+    }
+
+    .result {
+      display: inline-flex;
+      width: 540px;
+      height: 42px;
+      max-width: 100%;
+      align-items: center;
+      margin-top: 12px;
+      padding: 4px 9px;
+      border: 1px solid var(--green-line);
+      border-radius: 8px;
+      background: var(--green-bg);
+      color: #1c5632;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    @media (max-width: 720px) {
+      main { width: min(100% - 20px, 620px); padding-top: 16px; }
+      .grid { grid-template-columns: 1fr; gap: 10px; }
+      .card--wide { grid-column: auto; }
+      .trigger, .content { padding-left: 14px; padding-right: 14px; }
+      .trigger { padding-top: 14px; padding-bottom: 14px; }
+      .goal-number { font-size: 38px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="intro">Нажми на плашку, чтобы раскрыть детали.</p>
+
+    <section class="grid" aria-label="Цель, ограничения качества и гипотезы">
+      <article class="card card--goal">
+        <button class="trigger" type="button" aria-expanded="false" aria-controls="goal-panel" id="goal-button">
+          <span class="trigger__title"><span class="title-icon" aria-hidden="true">◎</span>Цель</span>
+          <span class="chevron" aria-hidden="true"></span>
+        </button>
+        <div class="panel" id="goal-panel" role="region" aria-labelledby="goal-button">
+          <div class="panel__inner">
+            <div class="content">
+              <p class="goal-text">Увеличить выручку отдела продаж<br />за квартал:</p>
+              <span class="goal-number">+20%</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card card--quality">
+        <button class="trigger" type="button" aria-expanded="false" aria-controls="quality-panel" id="quality-button">
+          <span class="trigger__title"><span>Что нельзя ухудшить, пока растим выручку<br />(ограничения качества)</span></span>
+          <span class="chevron" aria-hidden="true"></span>
+        </button>
+        <div class="panel" id="quality-panel" role="region" aria-labelledby="quality-button">
+          <div class="panel__inner">
+            <div class="content quality-list">
+              <div class="quality-item">
+                <span class="quality-icon" aria-hidden="true">🪙</span>
+                <div><strong>Стоимость привлечения клиента не растёт</strong><small>Это то, сколько денег и усилий уходит на привлечение.</small></div>
+              </div>
+              <div class="quality-item">
+                <span class="quality-icon" aria-hidden="true">🙂</span>
+                <div><strong>Удовлетворённость клиентов не падает</strong><small>Например, NPS не ниже 8/10.</small></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card card--wide">
+        <button class="trigger" type="button" aria-expanded="false" aria-controls="hypothesis-1-panel" id="hypothesis-1-button">
+          <span class="trigger__title"><span class="tag">Гипотеза 1</span></span>
+          <span class="chevron" aria-hidden="true"></span>
+        </button>
+        <div class="panel" id="hypothesis-1-panel" role="region" aria-labelledby="hypothesis-1-button">
+          <div class="panel__inner">
+            <div class="content hypothesis">
+              <p><strong>Если в CRM будут готовые скрипты и подсказки по истории клиента,</strong> менеджер будет делать больше результативных звонков, потому что меньше времени тратит на подготовку.</p>
+              <span class="result">Это увеличит число назначенных встреч и выручку</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card card--wide">
+        <button class="trigger" type="button" aria-expanded="false" aria-controls="hypothesis-2-panel" id="hypothesis-2-button">
+          <span class="trigger__title"><span class="tag">Гипотеза 2</span></span>
+          <span class="chevron" aria-hidden="true"></span>
+        </button>
+        <div class="panel" id="hypothesis-2-panel" role="region" aria-labelledby="hypothesis-2-button">
+          <div class="panel__inner">
+            <div class="content hypothesis">
+              <p><strong>Если отправлять клиенту персональное 30-секундное видео вместо стандартного текста,</strong> клиент чаще соглашается на встречу, потому что больше доверия и релевантности.</p>
+              <span class="result">Это увеличит конверсию в встречу и выручку</span>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    document.querySelectorAll('.trigger').forEach((button) => {
+      button.addEventListener('click', () => {
+        const panel = document.getElementById(button.getAttribute('aria-controls'));
+        const isOpen = button.getAttribute('aria-expanded') === 'true';
+        button.setAttribute('aria-expanded', String(!isOpen));
+        panel.classList.toggle('is-open', !isOpen);
+      });
+    });
+  </script>
+</body>
+</html>
